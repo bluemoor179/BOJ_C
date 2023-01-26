@@ -1,6 +1,52 @@
 #include<stdio.h>
 
 int main(int argc, char** argv) {
+    int n;
+    int num[26], word[10];
+
+    int len, temp;
+    char c;
+
+    for(int i = 0; i < 26; i++) {
+        num[i] = 0;
+    }
+
+    scanf("%d",&n);
+    for(int i = 0; i < n; i++) {
+        while(1) {
+            scanf("%c",&c);
+            if(c >= 'A' && c <= 'Z') {
+                break;
+            }
+        }
+        len = 0;
+        while(1) {
+            word[len++] = c - 'A';
+            scanf("%c",&c);
+            if(c < 'A' || c > 'Z') {
+                break;
+            }
+        }
+        temp = 1;
+        for(int i = len - 1; i >= 0; i--) {
+            num[word[i]] += temp;
+            temp *= 10;
+        }
+    }
+    for(int i = 0; i < 26; i++) {
+        for(int j = 0; j < 25; j++) {
+            if(num[j] < num[j + 1]) {
+                temp = num[j + 1];
+                num[j + 1] = num[j];
+                num[j] = temp;
+            }
+        }
+    }
+    int ans = 0, digit = 9;
+    for(int i = 0; i < 26; i++) {
+        ans += num[i] * digit--;
+    }
+    printf("%d", ans);
     return 0;
 }
 /*

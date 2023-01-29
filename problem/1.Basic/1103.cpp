@@ -2,7 +2,7 @@
 
 #define MAX 9999
 
-int search(int x, int y, char *board, int *n, int *m, bool *flag, int count) {
+int search(int x, int y, char *board, int *n, int *m, bool *flag, int* res, int count) {
     int current = x * *m + y;
     if(board[current] == 'H') {
         return count;
@@ -10,39 +10,51 @@ int search(int x, int y, char *board, int *n, int *m, bool *flag, int count) {
     if(flag[current]) {
         return MAX;
     }
-    flag[current] = true; 
+    if(res[current] > -1) {
+        if(res[current] == MAX) {
+            return MAX;
+        } else {
+            return count + res[current];
+        }
+    }
+    flag[current] = true;
 
     int num = board[current] - '0', ret = count + 1, temp;
 
     if(x + num < *n) {
-        temp = search(x + num, y, board, n, m, flag, count + 1);
-        if(temp > num)
-            num = temp;
+        temp = search(x + num, y, board, n, m, flag, res, count + 1);
+        if(temp > ret)
+            ret = temp;
     }
     if(x - num >= 0) {
-        temp = search(x - num, y, board, n, m, flag, count + 1);
-        if(temp > num)
-            num = temp;
+        temp = search(x - num, y, board, n, m, flag, res, count + 1);
+        if(temp > ret)
+            ret = temp;
     }
     if(y + num < *m) {
-        temp = search(x, y + num, board, n, m, flag, count + 1);
-        if(temp > num)
-            num = temp;
+        temp = search(x, y + num, board, n, m, flag, res, count + 1);
+        if(temp > ret)
+            ret = temp;
     }
     if(y - num >= 0) {
-        temp = search(x, y - num, board, n, m, flag, count + 1);
-        if(temp > num)
-            num = temp;
+        temp = search(x, y - num, board, n, m, flag, res, count + 1);
+        if(temp > ret)
+            ret = temp;
     }
 
     flag[current] = false;
-    return 0;
+    res[current] = ret - count;
+    if(ret == MAX) {
+        res[current] = MAX;
+    }
+    return ret;
 }
 
 int main(int argc, char* args[]) {
     int n, m, index = 0;
     char board[2500];
     bool flag[2500];
+    int res[2500];
     scanf("%d %d", &n, &m);
     for(int i = 0; i < n; i++) {
         for(int j = 0; j < m; j++) {
@@ -50,10 +62,11 @@ int main(int argc, char* args[]) {
             if(board[index] != 'H' && (board[index] < '0' || board[index] >'9')) {
                 scanf("%c", board + index);
             }
+            res[index] = -1;
             flag[index++] = false;
         }
     }
-    int ans = search(0, 0, board, &n, &m, flag, 0);
+    int ans = search(0, 0, board, &n, &m, flag, res, 0);
     if(ans == MAX) {
         ans = -1;
     }

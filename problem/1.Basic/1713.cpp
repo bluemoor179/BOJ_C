@@ -1,79 +1,62 @@
-#include <stdio.h>
-
-int find(int level, int k, int last, bool *word, bool *selected, int n) {
-    if(level == k) {
-        int count = 0;
-        for(int i = 0; i < n; i++) {
-            int j = 0;
-            for(; j < 26; j++) {
-                if(word[i * 26 + j] == 1 && selected[j] == 0) {
-                    break;
-                }
-            }
-            if(j == 26) {
-                count++;
-            }
-        }
-        return count;
-    }
-    int max = 0;
-    int ret;
-    for(int i = last + 1; i < 26; i++) {
-        if(selected[i] == 0) {
-            selected[i] = 1;
-
-            ret = find(level + 1, k, i, word, selected, n);
-            if(ret > max) {
-                max = ret;
-            }
-
-            selected[i] = 0;
-        }
-    }
-    return max;
-}
+#include<stdio.h>
 
 int main(int argc, char** argv) {
-    int n, k;
-    bool word[1300], selected[26];
-    char c;
-    int temp;
-    scanf("%d %d", &n, &k);
-    for(int i = 0; i < n; i++) {
-        temp = i * 26;
-        for(int j = 0; j < 26; j++) {
-            word[temp + j] = 0;
-        }
-        while(1) {
-            scanf("%c", &c);
-            if(c >= 'a' && c <= 'z') {
-                break;
+    int n, m;
+    int vote[101], history[101];
+    bool selected[101];
+    int count, input, temp;
+    
+    for (int i = 1; i <= 100; i++) {
+        vote[i] = 0;
+        selected[i] = 0;
+        history[i] = -1;
+    }
+    scanf("%d %d", &n, &m);
+
+    count = 0;
+    for(int i = 0; i < m; i++) {
+        scanf("%d", &input);
+        if(selected[input]) {
+            vote[input]++;
+        } else {
+            if(count < n) {
+                selected[input] = 1;
+                history[input] = i;
+                vote[input]++;
+                count++;
+            } else {
+                int j;
+                temp = -1;
+                for(j = 1; j <= 100; j++) {
+                    if(selected[j]) {
+                        if(temp == -1) {
+                            temp = j;
+                        } else if(vote[j] < vote[temp]) {
+                            temp = j;
+                        } else if(vote[j] == vote[temp] && history[j] < history[temp]) {
+                            temp = j;
+                        }
+                    }
+                }
+                selected[temp] = 0;
+                vote[temp] = 0;
+                selected[input] = 1;
+                vote[input]++;
+                history[input] = i;
             }
         }
-        while(1) {
-            word[temp + c - 'a'] = 1;
-            scanf("%c", &c);
-            if(c < 'a' || c > 'z') {
-                break;
+    }
+    bool isFirst = 1;
+    for(int i = 1; i <= 100; i++) {
+        if(selected[i]) {
+            if(!isFirst) {
+                printf(" ");
             }
-
+            printf("%d", i);
+            isFirst = 0;
         }
     }
-    int ans = 0;
-    if(k >= 5) {
-        for(int i = 0; i < 26; i++) {
-            selected[i] = 0;
-        }
-        selected['a' - 'a'] = 1;
-        selected['n' - 'a'] = 1;
-        selected['t' - 'a'] = 1;
-        selected['c' - 'a'] = 1;
-        selected['i' - 'a'] = 1;
-
-        ans = find(5, k, 0, word, selected, n);
-    }
-    printf("%d", ans);
-    return 0;   
+    return 0;
 }
 
 /*
